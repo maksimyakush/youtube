@@ -1,0 +1,147 @@
+*{
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+}
+
+.items {
+	display: flex;
+	justify-content: space-around;
+	height:440px;
+}
+
+.item {
+	font-family: "helvetica";
+	font-size:  20px;
+	width:322px;
+	border: purple solid 1px;
+}
+
+.item:hover {
+	box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+a {
+	display: block;
+	text-decoration: none;
+	color:inherit;
+	text-align:center;
+}
+
+input {
+	margin: 20px;
+}
+
+h4 {
+	margin-top: 10px;
+	text-align: center;
+	color: purple;
+	overflow: hidden;
+}
+
+input {
+  display: block;
+  margin: 0 auto;
+  width: 30%;
+  font-family: sans-serif;
+  font-size: 40px;
+  margin-top: 50px;
+  margin-bottom:50px;
+  color: purple; 
+}
+
+input:focus {
+  outline: none;
+  border: yellow solid 1px;
+}
+
+img {
+	border-bottom: purple solid 1px;
+}
+
+.features {
+	display: flex;
+	flex-direction: column;
+	margin-left: 90px;	
+}
+
+li {
+	list-style: none;
+	color: black;
+	margin-bottom: 20px;	
+}
+
+.channel:before {
+	font-family:'FontAwesome';
+	content:"\f007";
+	margin-right:8px;
+	color: orange;
+}
+
+.published:before {
+	font-family:'FontAwesome';
+	content:"\f073";
+	margin-right:8px;
+	color: orange;
+}
+
+.views:before {
+	font-family:'FontAwesome';
+	content:"\f06e";
+	margin-right:8px;
+	color: orange;
+}
+
+.main-block__item {
+	height: 300px;
+	overflow: hidden;
+}
+
+.btn-block  {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.btn-block button {
+	margin:30px;
+}
+
+.prev-btn, .next-btn{
+	font-family: "helvetica";
+	font-size:  16px;
+	color:purple;
+	height:30px;
+	width:130px;
+	background-color: transparent;
+	border: purple solid 1px;
+	cursor: pointer;
+	
+}
+
+.prev-btn:hover, .next-btn:hover {
+	box-shadow: 0 0 10px rgba(0,0,0,0.5);
+	border: orange solid 1px;
+}
+
+.btn-disabled {
+	font-family: "helvetica";
+	font-size:  16px;
+	height:30px;
+	width:130px;
+}
+
+.round {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width:30px;
+	height: 30px;
+	border-radius: 50%;
+	border: orange dotted 2px;
+}
+
+.tooltip {
+	position:absolute;
+	display: none;
+}

@@ -1,0 +1,19 @@
+{
+  "name": "youtube",
+  "version": "1.0.0",
+  "description": "project for epam",
+  "main": "./scripts/script.js",
+  "scripts": {
+    "start": "node script.js",
+    "build": "webpack --progress --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^6.4.1",
+    "babel-preset-es2015-native-modules": "^6.9.4",
+    "webpack": "^2.3.3"
+  }
+}
