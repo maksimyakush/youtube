@@ -78,6 +78,7 @@ let pagesArray = [];
 let mousePosition;
 const input = document.createElement('input');
 document.body.appendChild(input);
+input.placeholder = "Search youtube video";
 const itemsBlock = document.createElement('div');
 document.body.appendChild(itemsBlock);
 itemsBlock.classList.add('items');
