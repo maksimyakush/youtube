@@ -4,9 +4,10 @@ let pageNumber = 0;
 let pageMaxNumber = 0;
 let pagesArray = [];
 let mousePosition;
+const pixelsForRerender = 70;
 const input = document.createElement('input');
 document.body.appendChild(input);
-input.placeholder = "Search youtube video";
+input.placeholder = "Search...";
 const itemsBlock = document.createElement('div');
 document.body.appendChild(itemsBlock);
 itemsBlock.classList.add('items');
@@ -22,13 +23,30 @@ nextBtn.classList = 'next-btn';
 nextBtn.textContent = 'Next Page';
 const round = document.createElement('div');
 round.classList.add('round');
-const tooltip = document.createElement('span');
-tooltip.classList.add('tooltip');
-document.body.appendChild(tooltip);
+function recount(arr) {
+    pagesArray = arr.filter(item=>item.length>0 && item.length<5 && !item.includes(undefined));
+    for (let i = 0; i<arr.length; i++) {
+        if(arr[i].length==3 && arr[i+1]) {
+            arr[i].push(arr[i+1][0]);
+            arr[i].push(arr[i+1][1]);
+            arr[i].push(arr[i+1][2]);
+            arr[i+1].shift();
+            arr[i+1].shift();
+            arr[i+1].shift();
+        } else if(arr[i].length==2 && arr[i+1]) {
+            arr[i].push(arr[i+1][0]);
+            arr[i].push(arr[i+1][1]);
+            arr[i+1].shift();
+            arr[i+1].shift();
+        } else if (arr[i].length==1 && arr[i+1]) {
+            arr[i].push(arr[i+1][0]);
+            arr[i+1].shift();
+        }
+    }
+    return arr;
+}
+
 function getFetch() {
-    pagesArray = [];
-    pageNumber = 0;
-    pageMaxNumber = 0;
     const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
     const params = {
         part: 'snippet, id',
@@ -37,7 +55,7 @@ function getFetch() {
         q: search,
     };
     Object.keys(params).forEach(key => searchUrl.searchParams.append(key, params[key]));
-    fetch(searchUrl).then(res1 => res1.json()).then((res) => {
+    fetch(searchUrl).then(res => res.json()).then((res) => {
         nextPageToken = res.nextPageToken;
         return new Promise(resNext => resNext(res));
     })
@@ -45,52 +63,24 @@ function getFetch() {
         const searchIdArr = [];
         res.items.map(item => searchIdArr.push(item.id.videoId));
         const videosUrl = new URL('https://www.googleapis.com/youtube/v3/videos');
-        const params1 = {
+        const videoParams = {
             part: 'snippet, statistics',
             key: 'AIzaSyCCJIXC9eWHVKbPxdyocYR9uWK8041DeCw',
             id: searchIdArr.join(','),
         };
-        Object.keys(params1).forEach(key => videosUrl.searchParams.append(key, params1[key]));
-        fetch(videosUrl).then(res1 => res1.json()).then((res2) => {
+        Object.keys(videoParams).forEach(key => videosUrl.searchParams.append(key, videoParams[key]));
+        fetch(videosUrl).then(res => res.json()).then((res) => {
             const arr = [];
-            res2.items.map(item => arr.push(item));
-            arr.forEach(() => pagesArray.push(arr.splice(0, 3)));
-            if (arr.length > 0) pagesArray.push(arr);
-            const html = pagesArray[0].map((item) => {
-                return `<div class='item'>
-                    <div class='main-block__item'>
-                        <a href='https://www.youtube.com/watch?v=${item.id}' target='blank'>
-                        <img src='${item.snippet.thumbnails.medium.url}'></img></a>
-                        <h4><a href='https://www.youtube.com/watch?v=${item.id}'>${item.snippet.title}</a></h4>
-                    </div>
-                    <ul class='features'>
-                        <li class='channel'>${item.snippet.channelTitle}</h5>
-                        <li class='published'>${item.snippet.publishedAt.slice(0, 10)}</h5>
-                        <li class='views'>${Number(item.statistics.viewCount).toLocaleString()}</h5>
-                    </ul>
-                </div>`;
-            }).join('');
-            itemsBlock.innerHTML = html;
-            btnBlock.appendChild(prevBtn);
-            btnBlock.appendChild(round);
-            round.textContent = 1;
-            btnBlock.appendChild(nextBtn);
-            if (pageNumber === 0) {
-                prevBtn.classList.remove('prev-btn');
-                prevBtn.disabled = true;
-                prevBtn.classList.add('btn-disabled');
-            } else {
-                if (!prevBtn.classList.contains('prev-btn')) {
-                    prevBtn.classList.add('prev-btn');
-                }
-                prevBtn.disabled = false;
-                if (prevBtn.classList.contains('btn-disabled')) {
-                    prevBtn.classList.remove('btn-disabled');
-                }
-            }
+            res.items.map(item => arr.push(item));
+            if (window.screen.width >= 1024 && window.screen.height >= 768) {
+                arr.forEach(() => pagesArray.push(arr.splice(0, 4)));
+                if (arr.length > 0) pagesArray.push(arr);
+            }  else arr.forEach(() => pagesArray.push(arr.splice(0, 1)));
+           renderPage(0);       
         });
     });
 }
+
 function getFetchNext() {
     const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
     const params = {
@@ -111,23 +101,27 @@ function getFetchNext() {
         const searchIdArr = [];
         res.items.map(item => searchIdArr.push(item.id.videoId));
         const videosUrl = new URL('https://www.googleapis.com/youtube/v3/videos');
-        const params1 = {
+        const videoParams = {
             part: 'snippet, statistics',
             key: 'AIzaSyCCJIXC9eWHVKbPxdyocYR9uWK8041DeCw',
             id: searchIdArr.join(','),
         };
-        Object.keys(params1).forEach(key => videosUrl.searchParams.append(key, params1[key]));
+        Object.keys(videoParams).forEach(key => videosUrl.searchParams.append(key, videoParams[key]));
         fetch(videosUrl)
-        .then(res1 => res1.json())
+        .then(res => res.json())
         .then((item) => {
             const arr = [];
-            item.items.map(item1 => arr.push(item1));
-            arr.forEach(() => pagesArray.push(arr.splice(0, 3)));
-            if (arr.length > 0) pagesArray.push(arr);
-        });
+            item.items.map(item => arr.push(item));
+            if (window.screen.width >= 1024 && window.screen.height >= 768) {
+                arr.forEach(() => pagesArray.push(arr.splice(0, 4)));
+                if (arr.length > 0) pagesArray.push(arr);
+            }  else arr.forEach(() => pagesArray.push(arr.splice(0, 1)));         
+        })
     });
 }
+
 function renderPage(x) {
+     if (window.screen.width >= 1024 && window.screen.height >= 768) recount(pagesArray);
     const html = pagesArray[x].map((item) => {
         return `<div class='item'>
             <div class='main-block__item'>
@@ -145,7 +139,6 @@ function renderPage(x) {
     itemsBlock.innerHTML = html;
     btnBlock.appendChild(prevBtn);
     btnBlock.appendChild(round);
-    round.textContent = pageNumber + 1;
     btnBlock.appendChild(nextBtn);
     if (pageNumber === 0) {
         prevBtn.classList.remove('prev-btn');
@@ -162,32 +155,39 @@ function renderPage(x) {
     }
 }
 
-// Control block
 input.addEventListener('change', () => {
     search = input.value;
     itemsBlock.innerHTML = '';
+    pagesArray = [];
+    pageNumber = 0;
+    pageMaxNumber = 0;
+    round.textContent = 1;
     getFetch();
 });
 function handleDragStart(e) {
     mousePosition = e.clientX;
 }
 function handleDragEnd(e) {
-    if (e.clientX < mousePosition - 70) {
+    if (e.clientX < mousePosition - pixelsForRerender) {
         pageNumber += 1;
+        round.textContent = pageNumber + 1;
         if (pageMaxNumber < pageNumber) {
-            pageMaxNumber = pageNumber;
+            pageMaxNumber = pageNumber;         
             getFetchNext();
         }
         renderPage(pageNumber);
-    } else if (e.clientX > mousePosition + 70 && pageNumber > 0) {
+    } else if (e.clientX > mousePosition + pixelsForRerender && pageNumber > 0) {
+        console.log(pagesArray);
         pageNumber -= 1;
-        renderPage(pageNumber);
+        round.textContent = pageNumber + 1;
+        renderPage(pageNumber);   
     }
 }
-itemsBlock.addEventListener('dragstart', handleDragStart, false);
-itemsBlock.addEventListener('dragend', handleDragEnd, false);
+itemsBlock.addEventListener('dragstart', handleDragStart);
+itemsBlock.addEventListener('dragend', handleDragEnd);
 nextBtn.addEventListener('click', () => {
     pageNumber += 1;
+    round.textContent = pageNumber + 1;
     if (pageMaxNumber < pageNumber) {
         pageMaxNumber = pageNumber;
         getFetchNext();
@@ -196,38 +196,6 @@ nextBtn.addEventListener('click', () => {
 });
 prevBtn.addEventListener('click', () => {
     pageNumber -= 1;
+    round.textContent = pageNumber + 1;
     renderPage(pageNumber);
-});
-// End control block
-
-nextBtn.addEventListener('mousedown', (e) => {
-    tooltip.style.display = 'inline';
-    const x = e.clientX;
-    const y = e.clientY;
-    tooltip.style.top = `${y - 20}px`;
-    tooltip.style.left = `${x}px`;
-    tooltip.textContent = pageNumber + 2;
-}, false);
-prevBtn.addEventListener('mousedown', (e) => {
-    tooltip.style.display = 'inline';
-    const x = e.clientX;
-    const y = e.clientY;
-    tooltip.style.top = `${y - 20}px`;
-    tooltip.style.left = `${x}px`;
-    if (pageNumber > 0) tooltip.textContent = pageNumber;
-}, false);
-nextBtn.addEventListener('mouseup', () => {
-    tooltip.style.display = '';
-});
-prevBtn.addEventListener('mouseup', () => {
-    tooltip.style.display = '';
-});
-nextBtn.addEventListener('mousemove', () => {
-    tooltip.style.display = '';
-});
-prevBtn.addEventListener('mousemove', () => {
-    tooltip.style.display = '';
-});
-itemsBlock.addEventListener('mousemove', () => {
-    tooltip.style.display = '';
 });

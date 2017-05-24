@@ -42,7 +42,7 @@ h4 {
 input {
   display: block;
   margin: 0 auto;
-  width: 30%;
+  width: 70%;
   font-family: sans-serif;
   font-size: 40px;
   margin-top: 50px;
@@ -139,9 +139,4 @@ li {
 	height: 30px;
 	border-radius: 50%;
 	border: orange dotted 2px;
-}
-
-.tooltip {
-	position:absolute;
-	display: none;
 }
